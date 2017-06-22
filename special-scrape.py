@@ -10,9 +10,10 @@ import time
 # Import smtplib (to allow us to email)
 import smtplib
 
+from email.mime.text import MIMEText
+
 # using code from these two tutorials:
 # https://chrisalbon.com/python/monitor_a_website.html
-# https://www.dataquest.io/blog/web-scraping-tutorial-python/
 # while this is true (it is true by default),
 while True:
     # set the url as ballotpedia,
@@ -23,26 +24,40 @@ while True:
     response = requests.get(url, headers=headers)
     # parse the downloaded homepage and grab all text, then,
     soup = BeautifulSoup(response.text, "lxml")
-    print(soup.prettify())
+    # print(soup.prettify())
+    # print(str(soup).count('class="mw-headline"'))
 
-    # TODO: change this to monitoring the number of special election divs
-    if str(soup).find("special") == -1:
-        # wait 60 seconds,
-        time.sleep(60)
+    # declare previous number of classes variable if does not exist
+    try:
+      previous
+    except NameError:
+      previous = 0
+
+    # if the number of times the class mw-headline, which is unique to the special elections list items, is equal to the previous comparison then run for another cycle
+    if str(soup).count('class="mw-headline"') == previous:
+        # wait 86400 seconds (one day),
+        time.sleep(86400)
         # continue with the script,
+        print("running: " + time.strftime("%Y-%m-%d %H:%M"))
         continue
 
-    # change this to monitoring the number of special election divs...if there are additional
+    # if the number of times the mw-headline class appears is different, reassign the number to previous and send out an email
     else:
-        # create an email message with just a subject line,
-        msg = 'Subject: This is Vanessa\'s script talking, CHECK the elections page!'
+        previous = str(soup).count('class="mw-headline"')
+
         # set the 'from' address,
         fromaddr = 'specialelectionsupdate@gmail.com'
-        # set the 'to' addresses...add additional if you want the emails
+        # set the 'to' address
         toaddrs  = ['vanessa@flippable.org', 'specialelectionsupdate@gmail.com']
-        
-        # TODO: determine the diff to get the added election
-        # TODO: add email body with diff
+
+        SUBJECT = "ACTION STATIONS!"
+
+        # msg = str(soup)
+        msg = "There's a new special election!"
+        msg = MIMEText(msg)
+        msg['Subject'] = SUBJECT
+        msg['To'] = ", ".join(toaddrs)
+        msg['From'] = fromaddr
 
         # setup the email server,
         server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -51,13 +66,14 @@ while True:
         server.login("specialelectionsupdate@gmail.com", "gnnqgzCGo0bkLCffdQn5")
 
         # Print the email's contents
-        print('From: ' + fromaddr)
-        print('To: ' + str(toaddrs))
-        print('Message: ' + msg)
+        # print('From: ' + fromaddr)
+        # print('To: ' + str(toaddrs))
+        # print('Message: ' + msg)
+        print("new election: " + time.strftime("%Y-%m-%d %H:%M"))
 
         # send the email
-        server.sendmail(fromaddr, toaddrs, msg)
+        server.sendmail(fromaddr, toaddrs, msg.as_string())
         # disconnect from the server
         server.quit()
 
-        break
+        continue

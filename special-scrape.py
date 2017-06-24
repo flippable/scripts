@@ -34,26 +34,27 @@ while True:
       previous = 0
 
     # if the number of times the class mw-headline, which is unique to the special elections list items, is equal to the previous comparison then run for another cycle
-    if str(soup).count('class="mw-headline"') == previous:
+    if str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">') == previous:
         # wait 86400 seconds (one day),
-        time.sleep(86400)
+        time.sleep(3600)
         # continue with the script,
         print("running: " + time.strftime("%Y-%m-%d %H:%M"))
+        print(str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">'))
         continue
 
     # if the number of times the mw-headline class appears is different, reassign the number to previous and send out an email
-    else:
-        previous = str(soup).count('class="mw-headline"')
+    elif ((str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">') != previous) and previous > 1):
+        previous = str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">')
 
         # set the 'from' address,
         fromaddr = 'specialelectionsupdate@gmail.com'
         # set the 'to' address
-        toaddrs  = ['vanessa@flippable.org', 'specialelectionsupdate@gmail.com']
+        toaddrs  = ['vanessa@flippable.org', 'specialelectionsupdate@gmail.com', 'ian@flippable.org', 'chris@flippable.org', 'catherine@flippable.org', 'joseph@flippable.org']
 
-        SUBJECT = "ACTION STATIONS!"
+        SUBJECT = "There's a new special election!"
 
         # msg = str(soup)
-        msg = "There's a new special election!"
+        msg = "check:  https://ballotpedia.org/State_legislative_special_elections,_2017"
         msg = MIMEText(msg)
         msg['Subject'] = SUBJECT
         msg['To'] = ", ".join(toaddrs)
@@ -75,5 +76,34 @@ while True:
         server.sendmail(fromaddr, toaddrs, msg.as_string())
         # disconnect from the server
         server.quit()
+        continue
+    else:
+        previous = str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">')
+        # set the 'from' address,
+        fromaddr = 'specialelectionsupdate@gmail.com'
+        # set the 'to' address
+        toaddrs  = ['vanessa@flippable.org']
 
+        SUBJECT = "Initializing script!"
+
+        # msg = str(soup)
+        msg = "you're awesome"
+        msg = MIMEText(msg)
+        msg['Subject'] = SUBJECT
+        msg['To'] = ", ".join(toaddrs)
+        msg['From'] = fromaddr
+
+        # setup the email server,
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        # add my account login name and password,
+        server.login("specialelectionsupdate@gmail.com", "gnnqgzCGo0bkLCffdQn5")
+
+        # send the email
+        server.sendmail(fromaddr, toaddrs, msg.as_string())
+        # disconnect from the server
+        server.quit()
+        print("initializing: " + time.strftime("%Y-%m-%d %H:%M"))
+        print(previous)
+        print(str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">'))
         continue

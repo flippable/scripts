@@ -34,17 +34,17 @@ while True:
       previous = 0
 
     # if the number of times the class mw-headline, which is unique to the special elections list items, is equal to the previous comparison then run for another cycle
-    if str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">') == previous:
+    if str(soup).count('collapsible collapsed') == previous:
         # wait 86400 seconds (one day),
         time.sleep(3600)
         # continue with the script,
         print("running: " + time.strftime("%Y-%m-%d %H:%M"))
-        print(str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">'))
+        print(str(soup).count('collapsible collapsed'))
         continue
 
     # if the number of times the mw-headline class appears is different, reassign the number to previous and send out an email
-    elif ((str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">') != previous) and previous > 1):
-        previous = str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">')
+    elif ((str(soup).count('collapsible collapsed') != previous) and previous > 1):
+        previous = str(soup).count('collapsible collapsed')
 
         # set the 'from' address,
         fromaddr = 'specialelectionsupdate@gmail.com'
@@ -78,7 +78,7 @@ while True:
         server.quit()
         continue
     else:
-        previous = str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">')
+        previous = str(soup).count('collapsible collapsed')
         # set the 'from' address,
         fromaddr = 'specialelectionsupdate@gmail.com'
         # set the 'to' address
@@ -105,5 +105,5 @@ while True:
         server.quit()
         print("initializing: " + time.strftime("%Y-%m-%d %H:%M"))
         print(previous)
-        print(str(soup).count('<a href="/Portal:Elections" title="Portal:Elections">'))
+        print(str(soup).count('collapsible collapsed'))
         continue
